@@ -34,7 +34,7 @@
                     @if($approvedUsers->isEmpty())
                         <div class="alert alert-secondary">No approved users.</div>
                     @else
-                        <table>
+                        <table class="table table-bordered" >
   <thead>
     <tr>
       <th>ID</th>
@@ -65,8 +65,16 @@
     @endforeach
   </tbody>
 </table>
+<!-- <div class="pagination">
+     {{ $approvedUsers->links() }}
+</div> -->
 
-                        {{ $approvedUsers->links() }}
+<div class="d-flex justify-content-center mt-3">
+    {{ $approvedUsers->appends(request()->query())->links('pagination::bootstrap-5') }}
+</div>
+
+
+                       
                     @endif
                 </div>
 
@@ -134,7 +142,10 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        {{ $pendingUsers->appends(request()->query())->links() }}
+                      <div class="d-flex justify-content-center mt-3">
+    {{ $approvedUsers->appends(request()->query())->links('pagination::bootstrap-5') }}
+</div>
+
 
                     @endif
                 </div>
@@ -144,6 +155,5 @@
 </div>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
