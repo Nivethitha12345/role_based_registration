@@ -47,14 +47,7 @@
                 <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm Password" required>
             </div>
 
-            {{-- Role Dropdown --}}
-            <div class="mb-3">
-                <select name="role" class="form-control" required>
-                    <option value="" disabled selected>Select Role</option>
-                    <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                </select>
-            </div>
+           
 
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Register</button>

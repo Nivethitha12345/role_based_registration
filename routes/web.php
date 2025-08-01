@@ -63,3 +63,13 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::put('/users/{id}/update', [LoginController::class, 'updateUser'])->name('admin.users.update');
     Route::delete('/users/{id}/delete', [LoginController::class, 'deleteUser'])->name('admin.users.delete');
 });
+
+Route::post('/admin/upload', [LoginController::class, 'upload'])->name('admin.upload');
+
+use App\Http\Controllers\FileController;
+
+Route::get('/upload', [LoginController::class, 'uploadForm'])->name('files.upload');
+Route::post('/upload', [LoginController::class, 'uploadFile'])->name('files.store');
+Route::get('/files', [LoginController::class, 'listFiles'])->name('files.list');
+       
+Route::delete('/delete-file/{id}', [LoginController::class, 'delete'])->name('file.delete');

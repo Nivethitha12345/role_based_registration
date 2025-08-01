@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use Log;
+use App\Models\Upload;
+use Illuminate\Support\Facades\Storage;
 
 class LoginController extends Controller
 {
@@ -100,7 +102,9 @@ class LoginController extends Controller
     }
     $pendingUsers = $pendingUsersQuery->paginate(10, ['*'], 'pending')->appends($request->query());
 
-    return view('admindashboard', compact('totalUsers', 'approvedUsers', 'pendingUsers', 'searchName', 'searchEmail', 'filterRole'));
+    $files = Upload::orderby('created_at', 'desc')->get();
+
+    return view('admindashboard', compact('totalUsers', 'approvedUsers', 'pendingUsers', 'searchName', 'searchEmail', 'filterRole', 'files'));
 }
 
     public function approve($id)
@@ -239,4 +243,40 @@ public function deleteUser($id)
     return redirect()->route('admin.dashboard')->with('success', 'User deleted successfully.');
 }
 
+
+public function upload(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|max:2048',
+        'title' => 'required|max:255',
+    ]);
+
+    $file = $request->file('file');
+    $path = $file->store('uploads', 'public');
+    
+// File view and delete
+
+    Upload::create([
+        'title' =>  $request->title,
+        'filename' => $file->getClientOriginalName(),
+        'path' => $path,
+    ]);
+
+    return redirect()->route('admin.dashboard')
+        ->with('success', 'File uploaded successfully.');
+}
+
+public function delete($id,Request $request)
+{
+    $file= Upload::findOrFail($id);
+    $file->delete();
+    $file = $request->input('file');
+
+    if (\Storage::disk('public')->exists($file)) {
+        \Storage::disk('public')->delete($file);
+        return back()->with('success', 'File deleted successfully.');
+    }
+
+    return redirect()->route('admin.dashboard')->with('success', 'file  deleted successfully.');
+}
 }
