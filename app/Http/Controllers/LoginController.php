@@ -33,7 +33,7 @@ class LoginController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|confirmed|min:8',
-            'role'     => 'required|in:user', // Restrict admin registration
+            // 'role'     => 'required|in:user', // Restrict admin registration
         ]);
 
         if ($validator->fails()) {
@@ -227,7 +227,7 @@ public function updateUser(Request $request, $id)
     $user = User::findOrFail($id);
     $user->name  = $request->name;
     $user->email = $request->email;
-    $user->role  = $request->role;
+    $user->role  = 'user';
     $user->save();
 
     return redirect()->route('admin.dashboard')->with('success', 'User updated successfully.');
