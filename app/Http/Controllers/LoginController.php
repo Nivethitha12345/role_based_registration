@@ -222,7 +222,6 @@ public function updateUser(Request $request, $id)
     $request->validate([
         'name'  => 'required|string|max:255',
         'email' => 'required|email|unique:users,email,' . $id,
-        'role'  => 'required|in:user,admin',
     ]);
 
     $user = User::findOrFail($id);
