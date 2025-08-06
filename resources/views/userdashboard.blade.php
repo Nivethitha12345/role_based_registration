@@ -30,7 +30,7 @@
 
             <hr>
 
-            <p>This is your personal dashboard. You can customize this section with your own features.</p>
+            <p>This is your personal dashboard..</p>
         </div>
     </div>
 

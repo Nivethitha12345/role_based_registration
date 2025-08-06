@@ -19,7 +19,26 @@
             </div>
 
             <div class="card-body">
-                <h5>Total Users: <span class="badge bg-success">{{ $totalUsers }}</span></h5>
+                <div class="row text-center mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h6>Total Users</h6>
+            <h4><span class="badge bg-primary">{{ $totalUsers }}</span></h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h6>Approved Users</h6>
+            <h4><span class="badge bg-success">{{ $approvedUserCount }}</span></h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h6>Pending Approval</h6>
+            <h4><span class="badge bg-warning text-dark">{{ $pendingUserCount }}</span></h4>
+        </div>
+    </div>
+</div>
 
                 <ul class="nav nav-pills my-4" id="dashboardTabs" role="tablist">
 
@@ -51,7 +70,7 @@
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th>S.No</th>
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Role</th>
@@ -59,9 +78,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($approvedUsers as $user)
+                                    @foreach($approvedUsers as  $index =>$user)
                                         <tr>
-                                            <td>{{ $user->id }}</td>
+                                            <td>{{ $approvedUsers->firstItem() + $index }}</td> <!-- ✅ Serial number -->
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td>{{ $user->role }}</td>
@@ -118,7 +137,7 @@
                             <table class="table table-bordered">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>#</th>
+                                        <th>S.No</th>
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Registered At</th>

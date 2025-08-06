@@ -74,6 +74,8 @@ class LoginController extends Controller
  public function adminDashboard(Request $request)
 {
     $totalUsers = User::count();
+    $approvedUserCount = User::where('is_approved', 1)->count();
+    $pendingUserCount = User::where('is_approved', 0)->count();
 
     $searchName = $request->input('name');
     $searchEmail = $request->input('email');
@@ -104,7 +106,18 @@ class LoginController extends Controller
 
     $files = Upload::orderby('created_at', 'desc')->get();
 
-    return view('admindashboard', compact('totalUsers', 'approvedUsers', 'pendingUsers', 'searchName', 'searchEmail', 'filterRole', 'files'));
+    return view('admindashboard', compact(
+    'totalUsers',
+    'approvedUserCount',
+    'pendingUserCount',
+    'approvedUsers',
+    'pendingUsers',
+    'searchName',
+    'searchEmail',
+    'filterRole',
+    'files'
+));
+
 }
 
     public function approve($id)
@@ -221,7 +234,7 @@ public function updateUser(Request $request, $id)
 {
     $request->validate([
         'name'  => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $id,
+        // 'email' => 'required|email|unique:users,email,' . $id,
     ]);
 
     $user = User::findOrFail($id);
