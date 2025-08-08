@@ -258,25 +258,39 @@ public function deleteUser($id)
 
 public function upload(Request $request)
 {
+  
     $request->validate([
-        'file' => 'required|file|max:2048',
-        'title' => 'required|max:255',
+        'files'   => 'required',
+        'files.*' => 'file|max:2048', // each file <= 2MB
+        'title'   => 'nullable|max:255',
     ]);
 
-    $file = $request->file('file');
-    $path = $file->store('uploads', 'public');
-    
-// File view and delete
+    $uploadedFiles = [];
 
-    Upload::create([
-        'title' =>  $request->title,
-        'filename' => $file->getClientOriginalName(),
-        'path' => $path,
+    if ($request->hasFile('files')) {
+        foreach ($request->file('files') as $file) {
+            $path = $file->store('uploads', 'public');
+
+            $upload = Upload::create([
+                'title'    => $request->title,
+                'filename' => $file->getClientOriginalName(),
+                'path'     => $path,
+            ]);
+
+            $uploadedFiles[] = [
+                'id'       => $upload->id,
+                'filename' => $file->getClientOriginalName(),
+                'path'     => asset('storage/' . $path),
+            ];
+        }
+    }
+
+    return response()->json([
+        'success' => true,
+        'files'   => $uploadedFiles
     ]);
-
-    return redirect()->route('admin.dashboard')
-        ->with('success', 'File uploaded successfully.');
 }
+
 
 public function delete($id,Request $request)
 {
@@ -291,4 +305,6 @@ public function delete($id,Request $request)
 
     return redirect()->route('admin.dashboard')->with('success', 'file  deleted successfully.');
 }
+
+
 }

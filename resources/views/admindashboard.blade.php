@@ -217,14 +217,15 @@
                                     </tr>
                                 @endforelse
                             </table>
+
                         </div>
                         <div class="d-none" id="uploadfileform">
                             <button type="submit" class="btn btn-primary d-none" id="backlist">Back to List</button>
                             <!-- <div id="uploadFormSection" style="display: none;">
 </div> -->
-                            <form action="{{ route('admin.upload') }}" method="POST" enctype="multipart/form-data"
-                                class="mt-3">
-                                @csrf
+                            <!-- <form action="{{ route('admin.upload') }}" method="POST" enctype="multipart/form-data" -->
+                                <!-- class="mt-3"> -->
+                                <!-- @csrf -->
 
                                 <!-- Title input -->
                                 <div class="mb-3">
@@ -232,14 +233,18 @@
                                     <input type="text" class="form-control" id="title" name="title" required>
                                 </div>
 
+                                <meta name="csrf-token" content="{{ csrf_token() }}">
+
                                 <!-- File input -->
-                                <div class="mb-3">
+                                <!-- <div class="mb-3">
                                     <label for="uploadFile" class="form-label">Choose File</label>
                                     <input type="file" class="form-control" id="uploadFile" name="file" required>
-                                </div>
+                                </div> -->
 
-                                <button type="submit" class="btn btn-primary">Upload</button>
-                            </form>
+                               <input type="file" id="fileInput" multiple class="form-control mb-2">
+<div id="previewContainer" class="mb-3"></div>
+                               <button type="button" id="uploadBtn" class="btn btn-primary">Upload Selected Files</button>
+                            <!-- </form> -->
                         </div>
 
                     </div>
@@ -254,6 +259,7 @@
     </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     <!-- Optional: Activate tab from URL hash -->
     <script>
@@ -300,6 +306,94 @@
         });
 
     </script>
+<script>
+const fileInput = document.getElementById('fileInput');
+const previewContainer = document.getElementById('previewContainer');
+const uploadBtn = document.getElementById('uploadBtn');
+
+let fileList = []; // stores File objects
+
+// Handle file selection
+fileInput.addEventListener('change', () => {
+    const newFiles = Array.from(fileInput.files);
+    newFiles.forEach(file => {
+        const fileId = `${file.name}-${Date.now()}`;
+
+        fileList.push({ id: fileId, file: file, uploaded: false });
+
+        const fileRow = document.createElement('div');
+        fileRow.className = 'd-flex align-items-center mb-2';
+        fileRow.id = fileId;
+
+        fileRow.innerHTML = `
+            <span class="me-3">${file.name}</span>
+            <span class="status text-muted me-3">(Not uploaded)</span>
+            <button type="button" class="btn btn-sm btn-danger delete-btn">Delete</button>
+        `;
+
+        fileRow.querySelector('.delete-btn').addEventListener('click', () => {
+            fileRow.remove();
+            fileList = fileList.filter(f => f.id !== fileId);
+        });
+
+        previewContainer.appendChild(fileRow);
+    });
+
+    fileInput.value = ''; // reset so same file can be chosen again
+});
+
+// Handle upload click
+$(document).ready(function() {
+uploadBtn.addEventListener('click', () => {
+    if (fileList.length === 0) {
+        alert("No files selected.");
+        return;
+    }
+
+    const formData = new FormData();
+    fileList.forEach(item => {
+        formData.append('files[]', item.file);
+    });
+ var title = document.getElementById('title').value;
+ console.log(title);
+     formData.append('title',title);
+
+    $.ajax({
+        url: "{{ route('files.store') }}", // use Blade to get correct route
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+         headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            'Accept': 'application/json'
+        },
+        success: function (response) {
+            const filesSection = document.getElementById('uploadedFilesSection');
+            const uploadForm = document.getElementById('toggleUploadForm');
+            const backlist = document.getElementById('backlist');
+            const uploadfileform = document.getElementById('uploadfileform');
+
+            // Don't hide the #upload tab — just toggle sections within it
+            filesSection.classList.remove('d-none');
+            uploadForm.classList.remove('d-none');
+            backlist.classList.add('d-none');
+            uploadfileform.classList.add('d-none');
+              window.location.reload(); // Reloads the current page
+
+            console.log('Uploaded successfully', response);
+           
+        },
+        error: function (xhr) {
+            console.error('Upload failed:', xhr.responseText);
+            alert('Upload failed: ' + xhr.responseText);
+        }
+    });
+});
+});
+
+</script>
+
 
 </body>
 
